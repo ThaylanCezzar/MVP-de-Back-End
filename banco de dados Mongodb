@@ -1,0 +1,66 @@
+"""
+MVP Trabalho BackEnd
+Data:2016
+Decrição: CRUD de usuário usando SQLite
+"""
+
+import sqlite3
+
+def conectar():
+    return sqlite3.connect("banco_de_dados.db")
+
+def criar_tabela(conexao):    
+    cursor = conexao.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+        )
+    ''')
+    conexao.commit()
+
+def inserir_usuario(conexao, nome):
+        cursor = conexao.cursor()
+        cursor.execute("INSERT INTO usuarios (nome) VALUES (?)", (nome))
+        conexao.commit()
+
+def listar_usuarios(conexao):
+    cursor = conexao.cursor()
+    cursor.execute("SELECT * FROM usuarios")
+    return cursor.fetchall()
+
+def atualizar_usuario(conexao, id, novo_nome):
+    cursor = conexao.cursor()
+    cursor.execute("UPDATE usuarios SET nome = ? WHERE id = ?", (novo_nome, id))
+    conexao.commit()
+
+def deletar_usuario(conexao, id):
+    cursor = conexao.cursor()
+    cursor.execute("DELETE FROM usuarios WHERE id = ?", (id,))
+    conexao.commit()
+    
+def main():
+    conexao = conectar()
+    
+    criar_tabela(conexao)
+    
+    inserir_usuario(conexao, "Alice Santos")
+    inserir_usuario(conexao, "Bob Silva")
+
+    print("Usuários cadastrados:")
+    print(listar_usuarios(conexao))
+
+    atualizar_usuario(conexao, 1, "Alice Silva")
+    
+    print("Após atualização:")
+    print(listar_usuarios(conexao))
+
+    deletar_usuario(conexao, 2)
+
+    print("Após deletar:")
+    print(listar_usuarios(conexao))
+
+    conexao.close()
+
+if __name__ == "__main__":
+    main()
